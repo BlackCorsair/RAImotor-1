@@ -102,3 +102,6 @@ ENV/
 
 # Avoid project metadata from intellij IDE
 .idea/
+
+#Avoid uploading the whole document collection
+docrepository/*.html
