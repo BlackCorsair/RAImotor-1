@@ -7,6 +7,7 @@ from tabulate import tabulate
 from random import randint
 from collections import OrderedDict
 from operator import itemgetter
+import xml.etree.ElementTree
 import search
 
 
@@ -56,13 +57,13 @@ class Controller:
                                 relation, normalized[term])
         self.manager.updateIDF()
 
-    def computeTable(self, queryArray, result, table, method):
+    def computeTable(self, topicArray, result, table, method):
         
         count = 1
-        for query in queryArray:
+        for topic in topicArray:
             index = 'Q' + str(count)
             table[index] = []
-            aux = result[query]
+            aux = result[topic['query']]
             for r in aux:
                 table['Files']= sorted(Path(self.directory).iterdir())
                 if method == 1:
@@ -81,23 +82,26 @@ class Controller:
         return table
 
     def displayResults(self):
-        queryfile = open('queryfile.txt', 'r')
-        queryArray = queryfile.read().splitlines()
+        topicArray = []
+        print("Running...")
+        root = xml.etree.ElementTree.parse('2010-topics.xml').getroot()       
+        
+        for topic in root.findall('topic'):
+            topicArray.append({'id':topic.get('id'),'query': topic.find('title').text})
+        
+        print(topicArray)
         table = OrderedDict()
         table['Files'] = []
 
         result = OrderedDict()
 
         # Compute all calculations
-        for query in queryArray:
-            normalized = self.normalizer.normalize(query)
-            result[query] = sorted(search.calcAll(normalized, self.manager.docs,
-                                           self.manager.relations,
-                                           self.manager.terms),
-                            key=itemgetter('doc'))
+        for topic in topicArray:
+            normalized = self.normalizer.normalize(topic['query'])
+            #result[query] = sorted(search.calcAll(normalized, self.manager.docs, self.manager.relations, self.manager.terms), key=itemgetter('doc'))
 
         print("RELEVANCIA: CosenoTFIDF")
-        table = self.computeTable(queryArray, result, table, 4)
+        table = self.computeTable(topicArray, result, table, 4)
         print(tabulate(table, headers="keys"))
 
 
