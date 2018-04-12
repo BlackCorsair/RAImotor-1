@@ -14,25 +14,20 @@
 
 ![Logo UC3M](https://madi.uc3m.es/wp-content/uploads/2015/01/Logo-uc3m.jpg)
 
+## Inicialización de archivos
+Se deben copiar los ficheros html al directorio /docrepository. Para hacer tal cosa, desde la carpeta Datos donde se encuentran los ficheros html, ejecutar el siguiente comando en terminal:
+
+`find [directorio donde estan los html] -name '*.html' -exec cp '{}' [directorio de docsrepository] \;`
+
 ## Consultas
 
-**Q1** - What video game won Spike's best driving game award in 2006?
-
-**Q2** - What is the default combination of Kensington cables?
-
-**Q3** - Who won the first ACM Gerard Salton prize?
+[fichero XML de consultas](https://github.com/FCLatorre/RAImotor/blob/develop/2010-topics.xml)
 
 ## Documentos
 
-[docs](https://github.com/FCLatorre/RAIvectorial/tree/develop/docrepository)
+[docs](https://github.com/FCLatorre/RAImotor/tree/develop/docrepository)
 
 ## Funciones de similitud
-
-**Producto Escalar TF:** Función de similitud del producto escalar con pesos según TF
-
-**Producto Escalar TF IDF:** Función de similitud del producto escalar con TFxIDF
-
-**Coseno TF:** Función de similitud del coseno con pesos TF
 
 **Coseno TF IDF:** Función de similitud del coseno con pesos TFxIDF
 
