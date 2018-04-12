@@ -1,4 +1,4 @@
-# Modelo Vectorial - RAI
+# Mejora Motor Recuperación - RAI
 
 ## Resumen
 
@@ -6,9 +6,9 @@
 
 **Asignatura:** Recuperación y Acceso a la Información (RAI)
 
-**Práctica:** Modelo Vectorial
+**Práctica:** Motor de Recuperación y Evaluación
 
-**Descripción:** Implementación de Modelo Vectorial de recuperación para el cálculo de similitud entre documentos y consultas
+**Descripción:** Desarrollar un motor de recuperación Web capaz de indizar y recuperar documentos Web
 
 **Lenguaje + Versión:** Python 3.6.4
 
