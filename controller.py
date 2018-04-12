@@ -96,21 +96,6 @@ class Controller:
                                            self.manager.terms),
                             key=itemgetter('doc'))
 
-        print("RELEVANCIA: ProductoEscalarTF")
-        table = self.computeTable(queryArray, result, table, 1)
-        print(tabulate(table, headers="keys"))
-        print()
-
-        print("RELEVANCIA: ProductoEscalarTFIDF")
-        table = self.computeTable(queryArray, result, table, 2)
-        print(tabulate(table, headers="keys"))
-        print()
-
-        print("RELEVANCIA: CosenoTF")
-        table = self.computeTable(queryArray, result, table, 3)
-        print(tabulate(table, headers="keys"))
-        print()
-
         print("RELEVANCIA: CosenoTFIDF")
         table = self.computeTable(queryArray, result, table, 4)
         print(tabulate(table, headers="keys"))
