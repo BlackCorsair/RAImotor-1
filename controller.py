@@ -40,7 +40,7 @@ class Controller:
             print("Working on file:", i.name)
             path = Path.cwd().joinpath(self.directory +
                                        "/" + i.name)
-            with path.open('r') as file:
+            with path.open('r', encoding='ascii', errors='replace') as file:
                 # Parser
                 filetext = self.parser.parse(file)
                 # Normalizer
@@ -57,14 +57,13 @@ class Controller:
         self.manager.updateIDF()
 
     def computeTable(self, queryArray, result, table, method):
-        
         count = 1
         for query in queryArray:
             index = 'Q' + str(count)
             table[index] = []
             aux = result[query]
             for r in aux:
-                table['Files']= sorted(Path(self.directory).iterdir())
+                table['Files'] = sorted(Path(self.directory).iterdir())
                 if method == 1:
                     # Recuperar resultado de Producto escalar TF
                     table[index].append(r['scalarTF'])
@@ -92,9 +91,9 @@ class Controller:
         for query in queryArray:
             normalized = self.normalizer.normalize(query)
             result[query] = sorted(search.calcAll(normalized, self.manager.docs,
-                                           self.manager.relations,
-                                           self.manager.terms),
-                            key=itemgetter('doc'))
+                                   self.manager.relations,
+                                   self.manager.terms),
+                                   key=itemgetter('doc'))
 
         print("RELEVANCIA: CosenoTFIDF")
         table = self.computeTable(queryArray, result, table, 4)
