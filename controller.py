@@ -9,6 +9,10 @@ from collections import OrderedDict
 from operator import itemgetter
 import xml.etree.ElementTree
 import search
+import signal
+import time
+import datetime
+
 
 
 class Controller:
@@ -16,7 +20,7 @@ class Controller:
     manager = DBManager()
     parser = HTMLParser()
     normalizer = Normalizer()
-
+    
     def __init__(self):
         print("Controller init")
         self.directory = "docrepository"
@@ -35,27 +39,39 @@ class Controller:
                 print("Invalid input")
 
     def setup(self):
+        print("Set up init: ",datetime.datetime.now())
         print("Found the following files:")
         p = Path(self.directory)
         for i in p.iterdir():
             print("Working on file:", i.name)
-            path = Path.cwd().joinpath(self.directory +
-                                       "/" + i.name)
-            with path.open('r') as file:
-                # Parser
-                filetext = self.parser.parse(file)
-                # Normalizer
-                normalized = self.normalizer.normalize(
-                    filetext)
-                # Save to DB
-                if self.manager.saveDoc(i.name) == 1:
-                    for term in normalized:
-                        if self.manager.saveTerm(term) == 1:
-                            relation = {'doc': i.name,
-                                        'term': term}
-                            self.manager.saveRelation(
-                                relation, normalized[term])
+            if i.name != ".gitkeep":
+                path = Path.cwd().joinpath(self.directory +
+                                           "/" + i.name)
+                with path.open('r') as file:
+                    # Parser
+                    filetext = self.parser.parse(file)
+                    # Normalizer
+                    def timeout_handler(num, stack):
+                        raise Exception("File timeout")
+
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(120)
+                    try:
+                        normalized = self.normalizer.normalize(filetext)
+                        # Save to DB
+                        '''if self.manager.saveDoc(i.name) == 1:
+                            for term in normalized:
+                                if self.manager.saveTerm(term) == 1:
+                                    relation = {'doc': i.name,
+                                                'term': term}
+                                    self.manager.saveRelation(relation, normalized[term])
+                        '''
+                    except Exception as ex:
+                        print("Unable to parse file:",i.name)
+                    finally:
+                        signal.alarm(0)
         self.manager.updateIDF()
+        print("Set up end: ",datetime.datetime.now())
 
     def computeTable(self, topicArray, result, table, method):
         
