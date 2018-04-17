@@ -47,7 +47,7 @@ class Controller:
             if i.name != ".gitkeep":
                 path = Path.cwd().joinpath(self.directory +
                                            "/" + i.name)
-                with path.open('r') as file:
+                with path.open('r', encoding='ascii', errors='replace') as file:
                     # Parser
                     filetext = self.parser.parse(file)
                     # Normalizer
@@ -59,13 +59,12 @@ class Controller:
                     try:
                         normalized = self.normalizer.normalize(filetext)
                         # Save to DB
-                        '''if self.manager.saveDoc(i.name) == 1:
+                        if self.manager.saveDoc(i.name) == 1:
                             for term in normalized:
                                 if self.manager.saveTerm(term) == 1:
                                     relation = {'doc': i.name,
                                                 'term': term}
                                     self.manager.saveRelation(relation, normalized[term])
-                        '''
                     except Exception as ex:
                         print("Unable to parse file:",i.name)
                     finally:
@@ -74,14 +73,13 @@ class Controller:
         print("Set up end: ",datetime.datetime.now())
 
     def computeTable(self, topicArray, result, table, method):
-        
         count = 1
         for topic in topicArray:
             index = 'Q' + str(count)
             table[index] = []
             aux = result[topic['query']]
             for r in aux:
-                table['Files']= sorted(Path(self.directory).iterdir())
+                table['Files'] = sorted(Path(self.directory).iterdir())
                 if method == 1:
                     # Recuperar resultado de Producto escalar TF
                     table[index].append(r['scalarTF'])

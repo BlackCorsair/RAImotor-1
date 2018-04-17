@@ -8,11 +8,8 @@ class HTMLParser:
 
     def parse(self, html_doc):
         soup = BeautifulSoup(html_doc, 'lxml')
-        # Remove scripts
-        for x in soup.findAll('script'):
-            x.extract()
-        # Remove styles
-        for x in soup.findAll('style'):
+        # Remove scripts and styles
+        for x in soup.findAll('script', 'style', 'href'):
             x.extract()
         # Avoid commets
         comments = soup.findAll(text=lambda text: isinstance(text, Comment))
