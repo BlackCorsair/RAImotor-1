@@ -45,3 +45,5 @@ processing human language data library - [nltk](http://www.nltk.org/)
 print output to console - [tabulate](https://pypi.python.org/pypi/tabulate)
 
 git extensions to provide high-level repository operations - [git-flow cheatsheet](https://danielkummer.github.io/git-flow-cheatsheet/)
+
+XML parsing - [XML ElementTree](https://docs.python.org/3/library/xml.etree.elementtree.html)

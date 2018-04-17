@@ -7,7 +7,12 @@ from tabulate import tabulate
 from random import randint
 from collections import OrderedDict
 from operator import itemgetter
+import xml.etree.ElementTree
 import search
+import signal
+import time
+import datetime
+
 
 
 class Controller:
@@ -15,7 +20,7 @@ class Controller:
     manager = DBManager()
     parser = HTMLParser()
     normalizer = Normalizer()
-
+    
     def __init__(self):
         print("Controller init")
         self.directory = "docrepository"
@@ -34,34 +39,45 @@ class Controller:
                 print("Invalid input")
 
     def setup(self):
+        print("Set up init: ",datetime.datetime.now())
         print("Found the following files:")
         p = Path(self.directory)
         for i in p.iterdir():
             print("Working on file:", i.name)
-            path = Path.cwd().joinpath(self.directory +
-                                       "/" + i.name)
-            with path.open('r', encoding='ascii', errors='replace') as file:
-                # Parser
-                filetext = self.parser.parse(file)
-                # Normalizer
-                normalized = self.normalizer.normalize(
-                    filetext)
-                # Save to DB
-                if self.manager.saveDoc(i.name) == 1:
-                    for term in normalized:
-                        if self.manager.saveTerm(term) == 1:
-                            relation = {'doc': i.name,
-                                        'term': term}
-                            self.manager.saveRelation(
-                                relation, normalized[term])
-        self.manager.updateIDF()
+            if i.name != ".gitkeep":
+                path = Path.cwd().joinpath(self.directory +
+                                           "/" + i.name)
+                with path.open('r', encoding='ascii', errors='replace') as file:
+                    # Parser
+                    filetext = self.parser.parse(file)
+                    # Normalizer
+                    def timeout_handler(num, stack):
+                        raise Exception("File timeout")
 
-    def computeTable(self, queryArray, result, table, method):
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(120)
+                    try:
+                        normalized = self.normalizer.normalize(filetext)
+                        # Save to DB
+                        if self.manager.saveDoc(i.name) == 1:
+                            for term in normalized:
+                                if self.manager.saveTerm(term) == 1:
+                                    relation = {'doc': i.name,
+                                                'term': term}
+                                    self.manager.saveRelation(relation, normalized[term])
+                    except Exception as ex:
+                        print("Unable to parse file:",i.name)
+                    finally:
+                        signal.alarm(0)
+        self.manager.updateIDF()
+        print("Set up end: ",datetime.datetime.now())
+
+    def computeTable(self, topicArray, result, table, method):
         count = 1
-        for query in queryArray:
+        for topic in topicArray:
             index = 'Q' + str(count)
             table[index] = []
-            aux = result[query]
+            aux = result[topic['query']]
             for r in aux:
                 table['Files'] = sorted(Path(self.directory).iterdir())
                 if method == 1:
@@ -80,23 +96,26 @@ class Controller:
         return table
 
     def displayResults(self):
-        queryfile = open('queryfile.txt', 'r')
-        queryArray = queryfile.read().splitlines()
+        topicArray = []
+        print("Running...")
+        root = xml.etree.ElementTree.parse('2010-topics.xml').getroot()       
+        
+        for topic in root.findall('topic'):
+            topicArray.append({'id':topic.get('id'),'query': topic.find('title').text})
+        
+        print(topicArray)
         table = OrderedDict()
         table['Files'] = []
 
         result = OrderedDict()
 
         # Compute all calculations
-        for query in queryArray:
-            normalized = self.normalizer.normalize(query)
-            result[query] = sorted(search.calcAll(normalized, self.manager.docs,
-                                   self.manager.relations,
-                                   self.manager.terms),
-                                   key=itemgetter('doc'))
+        for topic in topicArray:
+            normalized = self.normalizer.normalize(topic['query'])
+            #result[query] = sorted(search.calcAll(normalized, self.manager.docs, self.manager.relations, self.manager.terms), key=itemgetter('doc'))
 
         print("RELEVANCIA: CosenoTFIDF")
-        table = self.computeTable(queryArray, result, table, 4)
+        table = self.computeTable(topicArray, result, table, 4)
         print(tabulate(table, headers="keys"))
 
 
