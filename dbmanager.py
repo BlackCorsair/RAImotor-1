@@ -1,5 +1,5 @@
 #!venv/bin/python
-from pymongo import MongoClient, UpdateOne
+from pymongo import MongoClient, UpdateOne, HASHED
 from math import log10
 
 
@@ -12,11 +12,15 @@ class DBManager:
 
     def __init__(self):
         print("DBManager: Set up Database")
-        self.client = MongoClient('127.0.0.1:27017')
+        self.client = MongoClient('172.17.0.2:27017')
         self.db = self.client.db
         self.docs = self.db.docs
         self.terms = self.db.terms
         self.relations = self.db.relations
+        self.terms.create_index([('term', HASHED)], name='term_index')
+        self.docs.create_index([('name', HASHED)], name='doc_index')
+        self.relations.create_index([('term', HASHED)], name='term_index')
+        self.relations.create_index([('doc', HASHED)], name='doc_index')
 
     '''
         Name: saveTerm
@@ -154,6 +158,9 @@ class DBManager:
             self.db.drop_collection('docs')
             self.db.drop_collection('terms')
             self.db.drop_collection('relations')
+            self.db.terms.drop_indexes()
+            self.db.docs.drop_indexes()
+            self.db.relations.drop_indexes()
             return 1
         except Exception as e:
             print(e)
