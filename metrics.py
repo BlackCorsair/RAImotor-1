@@ -47,11 +47,3 @@ class Metrics:
         precission = "{'precission5': " + str(precission5) + \
                      ", 'precission10': " + str(precission10) + "}"
         return precission
-
-        # testing
-        '''
-        for (doc, rel) in relevance[0]:
-            print(doc + ", " + str(rel))
-        print(precission5)
-        print(precission10)
-        '''
