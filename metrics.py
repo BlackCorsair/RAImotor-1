@@ -38,7 +38,7 @@ class Metrics:
         precission5 = 0.0   # first 5 files
         precission10 = 0.0  # first 10 files
         count = 0
-        for (doc, rel) in relevance[0]:
+        for (doc, rel) in sorted(relevance[0]):
             if rel >= 1 and count < 5:
                 precission5 = precission5 + 0.2
             if rel >= 1 and count < 10:
