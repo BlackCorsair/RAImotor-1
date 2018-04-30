@@ -1,4 +1,4 @@
-#!venv/bin/activate
+#!venv/bin/python
 from metrics import Metrics
 m = Metrics()
 files = ['2010-13-080', '2010-00-072',
