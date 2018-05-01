@@ -9,6 +9,7 @@ import xml.etree.ElementTree
 import signal
 import time
 import datetime
+from nltk.corpus import wordnet
 
 
 class Controller:
@@ -22,14 +23,16 @@ class Controller:
         self.directory = "docrepository"
 
     def main(self):
-        print('Options: 1-setup 2-run 3-exit d-debug')
+        print('Options: 1-setup 2-run 3-run_debug_mode 4-exit d-debug')
         while True:
             text = input("> ")
             if(text == '1'):
                 self.setup()
             elif(text == '2'):
-                self.displayResults()
+                self.displayResults(False)
             elif(text == '3'):
+                self.displayResults(True)
+            elif(text == '4'):
                 break
             elif(text == 'd'):
                 self.setupDebug()
@@ -141,14 +144,16 @@ class Controller:
             count = count + 1
         return table
 
-    def displayResults(self):
+    def displayResults(self, debug):
         topicArray = []
-        print("Running...")
+        if debug:
+            print("Running...")
         root = xml.etree.ElementTree.parse('2010-topics.xml').getroot()
         for topic in root.findall('topic'):
             topicArray.append({'id': topic.get('id'), 'query':
                                topic.find('title').text})
-        print(topicArray)
+        if debug:
+            print(topicArray)
         table = OrderedDict()
         table['Files'] = []
 
@@ -156,13 +161,31 @@ class Controller:
 
         # Compute all calculations
         for topic in topicArray:
+            if debug:
+                print(topic['query'])
             normalized = self.normalizer.normalize(topic['query'])
+            queryArray = []
+            for term in normalized:
+                if debug:
+                    print("This is the term: ", term)
+                ss = wordnet.synsets(term)
+                if not ss:
+                    queryArray.append(term)
+                if not (not ss):
+                    if debug:
+                        print(ss[0].lemma_names())
+                    for x in ss[0].lemma_names():
+                        #Añadir términos relevantes a la consulta
+                        queryArray.append(x)        
+            if debug:
+                print("Extended Query>>>>>",queryArray)
+            
             #result[query] = sorted(search.calcAll(normalized, self.manager.docs, self.manager.relations, self.manager.terms), key=itemgetter('doc'))
-
+        '''
         print("RELEVANCIA: CosenoTFIDF")
         table = self.computeTable(topicArray, result, table, 4)
         print(tabulate(table, headers="keys"))
-
+        '''
 
 controller = Controller()
 controller.main()
