@@ -44,8 +44,7 @@ class Metrics:
             if rel >= 1 and count < 10:
                 Recall10 = Recall10 + 0.1
             count += 1
-        Recall = {'Recall5': " + str(Recall5) + \
-            ", 'Recall10': " + str(Recall10) + "}
+        Recall = {'Recall5': Recall5, 'Recall10': Recall10}
         return Recall
 
     '''
@@ -79,18 +78,14 @@ class Metrics:
             if rel >= 1 and count < 10:
                 precision10 = precision10 + (1 / fileNumber)
             count += 1
-        precision = {'precision5': " + str(precision5) + \
-            ", 'precision10': " + str(precision10) + "}
+        precision = {'precision5': precision5, 'precision10': precision10}
         return precision
 
     '''
-        Cut Precision 5, 10
-        This metric will check how many of the
-        docs are relevant from the total of documents
-        retrieved
+        F-Value = 2 * (precision*recall / (precision + recall)))
     '''
     '''
-        Name: cutPrecision
+        Name: FMeasure
         In: array with the file names of the documents returned
             ¡¡¡ SORTED BY NAME !!!
         Out: returns a string showing the cut precision
