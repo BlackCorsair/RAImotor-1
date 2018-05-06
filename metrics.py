@@ -1,5 +1,6 @@
 #!venv/bin/python
 import multiprocessing
+from operator import is_not
 from functools import partial
 
 
@@ -27,13 +28,10 @@ class Metrics:
     # auxiliar function so cutRecall can use multiple processes
     def checkRelevance(self, file, queryID):
         trel = open(self.trelFile, 'r')
-        print(file)
-        print(queryID)
         for line in trel:
             if file in line and queryID in line:
                 return str(file), int(line.split()[3])
-            else:
-                return str(file), 0
+        return str(file), 0
 
     def cutRecall(self, files, queryID):
         # checks the relevance of the Files
