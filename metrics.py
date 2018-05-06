@@ -11,7 +11,7 @@ class Metrics:
     '''
         Cut Recall 5, 10
         This metric will check how many of the
-        docs are relevant
+        docs are relevant from the total of documents
     '''
     '''
         Name: cutRecall
@@ -45,5 +45,40 @@ class Metrics:
                 Recall10 = Recall10 + 0.1
             count += 1
         Recall = "{'Recall5': " + str(Recall5) + \
-                     ", 'Recall10': " + str(Recall10) + "}"
+            ", 'Recall10': " + str(Recall10) + "}"
         return Recall
+
+    '''
+        Cut Precision 5, 10
+        This metric will check how many of the
+        docs are relevant from the total of documents
+        retrieved
+    '''
+    '''
+        Name: cutPrecision
+        In: array with the file names of the documents returned
+            ¡¡¡ SORTED BY NAME !!!
+        Out: returns a string showing the cut precision
+        Function: given an array of filenames, it will check the
+                relevance of the files and then will return an string
+                showing the cut precision 5, 10
+    '''
+
+    def cutPrecision(self, files):
+        fileNumber = len(files)
+        # checks the relevance of the Files
+        pool = multiprocessing.Pool()
+        relevance = [pool.map(self.checkRelevance, files)]
+        # saves the precision, which is relevantFiles / retrieved
+        precision5 = 0.0   # first 5 files
+        precision10 = 0.0  # first 10 files
+        count = 0
+        for (doc, rel) in sorted(relevance[0]):
+            if rel >= 1 and count < 5:
+                precision5 = precision5 + (1 / fileNumber)
+            if rel >= 1 and count < 10:
+                precision10 = precision10 + (1 / fileNumber)
+            count += 1
+        precision = "{'precision5': " + str(precision5) + \
+            ", 'precision10': " + str(precision10) + "}"
+        return precision
