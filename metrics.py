@@ -49,7 +49,7 @@ class Metrics:
             if rel >= 1 and count < 10:
                 Recall10 = Recall10 + 0.1
             count += 1
-        Recall = {'Recall5': Recall5, 'Recall10': Recall10}
+        Recall = {'recall5': Recall5, 'recall10': Recall10}
         return Recall
 
     '''
@@ -93,10 +93,16 @@ class Metrics:
     '''
     '''
         Name: FMeasure
-        In: array with the file names of the documents returned
-            ¡¡¡ SORTED BY NAME !!!
-        Out: returns a string showing the cut precision
-        Function: given an array of filenames, it will check the
-                relevance of the files and then will return an string
-                showing the cut precision 5, 10
+        In: {precision5, precision10}, {recall5, recall10} it requires
+            two dicts with the values
+        Out: returns a dict with the FMeasure values for 5, 10
+        Function: given the precision and recall cuts, it will calculate
+                the FMeasure (witten above) for 5 and 10
     '''
+
+    def FMeasure(self, precision, recall):
+        fvalue5 = 2 * (precision['precision5'] * recall['recall5'] /
+                       (precision['precision5'] + recall['recall5']))
+        fvalue10 = 2 * (precision['precision10'] * recall['recall10'] /
+                        (precision['precision10'] + recall['recall10']))
+        return {'fvalue5': fvalue5, 'fvalue10': fvalue10}

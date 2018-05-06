@@ -6,6 +6,10 @@ files = ['2010-13-080', '2010-00-072',
          '2010-94-034', '2010-71-034', '2010-08-069',
          '2010-92-061', '2010-70-013']
 # tests the cutRecall
-print(m.cutRecall(sorted(files), '2010-001'))
+recall = m.cutRecall(sorted(files), '2010-001')
+print(recall)
 # tests the cutPrecision
-print(m.cutPrecision(sorted(files), '2010-001'))
+precision = m.cutPrecision(sorted(files), '2010-001')
+print(precision)
+# tests the FMeasure
+FMeasure = m.FMeasure(precision, recall)
