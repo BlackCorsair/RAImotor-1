@@ -1,6 +1,5 @@
 #!venv/bin/python
 import multiprocessing
-from operator import is_not
 from functools import partial
 
 
