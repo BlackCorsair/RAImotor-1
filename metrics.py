@@ -1,5 +1,6 @@
 #!venv/bin/python
 import multiprocessing
+from functools import partial
 
 
 class Metrics:
@@ -24,16 +25,22 @@ class Metrics:
     '''
 
     # auxiliar function so cutRecall can use multiple processes
-    def checkRelevance(self, file):
+    def checkRelevance(self, file, queryID):
         trel = open(self.trelFile, 'r')
+        print(file)
+        print(queryID)
         for line in trel:
-            if file in line:
+            if file in line and queryID in line:
                 return str(file), int(line.split()[3])
+            else:
+                return str(file), 0
 
-    def cutRecall(self, files):
+    def cutRecall(self, files, queryID):
         # checks the relevance of the Files
+        queryID = str(queryID)
         pool = multiprocessing.Pool()
-        relevance = [pool.map(self.checkRelevance, files)]
+        relevance = [
+            pool.map(partial(self.checkRelevance, queryID=queryID), files)]
         # saves the Recall, which is relevantFiles / retrieved
         Recall5 = 0.0   # first 5 files
         Recall10 = 0.0  # first 10 files
@@ -63,11 +70,13 @@ class Metrics:
                 showing the cut precision 5, 10
     '''
 
-    def cutPrecision(self, files):
+    def cutPrecision(self, files, queryID):
         fileNumber = len(files)
+        queryID = str(queryID)
         # checks the relevance of the Files
         pool = multiprocessing.Pool()
-        relevance = [pool.map(self.checkRelevance, files)]
+        relevance = [
+            pool.map(partial(self.checkRelevance, queryID=queryID), files)]
         # saves the precision, which is relevantFiles / retrieved
         precision5 = 0.0   # first 5 files
         precision10 = 0.0  # first 10 files
