@@ -14,73 +14,76 @@ from math import sqrt
     Function: the function runs all the calculations MUAJAJAJAJAJA
 '''
 
+class Search:
+    def __init__(self):
+        print("Searcher init")
 
-def calcAll(query, docs, relations, terms):
-    calcs = []
-    qdivCosTF = sqrt(len(query))
-    qdivCos = calcQueryCosDiv(query, terms)
-    for doc in docs.find():
+    def calcAll(self, query, docs, relations, terms):
+        calcs = []
+        qdivCosTF = sqrt(len(query))
+        qdivCos = self.calcQueryCosDiv(query, terms)
+        for doc in docs.find():
+            # variable initialization
+            scalarTF_IDF = 0
+            scalarTF = 0
+            divCosTF = 0
+            divCosTF_DF = 0
+            # middlecalc
+            values = self.calcScalarDivCos(
+                query, doc['name'], relations, terms)
+            scalarTF = values[0]
+            divCosTF = values[1]
+            scalarTF_IDF = values[2]
+            divCosTF_DF = values[3]
+            # final calculations
+            try:
+                cosTFDivisor = sqrt(divCosTF) * qdivCosTF
+                cosTF_IDFDivisor = sqrt(divCosTF_DF) * sqrt(qdivCos)
+                cosTF = float(scalarTF / cosTFDivisor)
+                cosTF_IDF = float(scalarTF_IDF / cosTF_IDFDivisor)
+            except ZeroDivisionError:
+                cosTF = 0
+                cosTF_IDF = 0
+            # return the calculations
+            calcs.append({'doc': doc['name'], 'cosTF': float(cosTF),
+                          'scalarTF': scalarTF, 'cosTF_IDF': cosTF_IDF,
+                          'scalarTF_IDF': scalarTF_IDF})
+        return calcs
+
+
+    def calcScalarDivCos(self, query, doc, relations, terms):
+        # all relations where appears doc
+        rel = list(relations.find({'doc': doc}))
         # variable initialization
-        scalarTF_IDF = 0
         scalarTF = 0
+        scalarTF_IDF = 0
         divCosTF = 0
         divCosTF_DF = 0
-        # middlecalc
-        values = calcScalarDivCos(
-            query, doc['name'], relations, terms)
-        scalarTF = values[0]
-        divCosTF = values[1]
-        scalarTF_IDF = values[2]
-        divCosTF_DF = values[3]
-        # final calculations
-        try:
-            cosTFDivisor = sqrt(divCosTF) * qdivCosTF
-            cosTF_IDFDivisor = sqrt(divCosTF_DF) * sqrt(qdivCos)
-            cosTF = float(scalarTF / cosTFDivisor)
-            cosTF_IDF = float(scalarTF_IDF / cosTF_IDFDivisor)
-        except ZeroDivisionError:
-            cosTF = 0
-            cosTF_IDF = 0
-        # return the calculations
-        calcs.append({'doc': doc['name'], 'cosTF': float(cosTF),
-                      'scalarTF': scalarTF, 'cosTF_IDF': cosTF_IDF,
-                      'scalarTF_IDF': scalarTF_IDF})
-    return calcs
 
-
-def calcScalarDivCos(query, doc, relations, terms):
-    # all relations where appears doc
-    rel = list(relations.find({'doc': doc}))
-    # variable initialization
-    scalarTF = 0
-    scalarTF_IDF = 0
-    divCosTF = 0
-    divCosTF_DF = 0
-
-    # this equals to term_tf * q
-    for r in rel:
-        # cosTF
-        tf = r['tf']
-        divCosTF = divCosTF + tf ** 2
-        divCosTF_DF = divCosTF_DF + \
-            (terms.find_one({'term': r['term']})['idf'] * tf) ** 2
-        if r['term'] in query:
+        # this equals to term_tf * q
+        for r in rel:
             # cosTF
-            scalarTF = scalarTF + tf
-            # cosTF_IDF
-            idf = terms.find_one({'term': r['term']})['idf']
-            # idf ** 2 = weight (idf * tf) * query_idf
-            weight = idf * tf
-            scalarTF_IDF = scalarTF_IDF + weight * idf
-    return [scalarTF, divCosTF, scalarTF_IDF, divCosTF_DF]
+            tf = r['tf']
+            divCosTF = divCosTF + tf ** 2
+            divCosTF_DF = divCosTF_DF + \
+                (terms.find_one({'term': r['term']})['idf'] * tf) ** 2
+            if r['term'] in query:
+                # cosTF
+                scalarTF = scalarTF + tf
+                # cosTF_IDF
+                idf = terms.find_one({'term': r['term']})['idf']
+                # idf ** 2 = weight (idf * tf) * query_idf
+                weight = idf * tf
+                scalarTF_IDF = scalarTF_IDF + weight * idf
+        return [scalarTF, divCosTF, scalarTF_IDF, divCosTF_DF]
 
 
-def calcQueryCosDiv(query, terms):
-    query_cos_div_tf_df = 0
-    for q in query:
-        try:
-            idf = terms.find_one({'term': q})['idf']
-        except Exception:
-            idf = 0
-        query_cos_div_tf_df = query_cos_div_tf_df + idf ** 2
-    return query_cos_div_tf_df
+    def calcQueryCosDiv(self, query, terms):
+        query_cos_div_tf_df = 0
+        for q in query:
+            try:
+                idf = terms.find_one({'term': q})['idf']
+            except Exception:
+                idf = 0
+            query_cos_div_tf_df = query_cos_div_tf_df + idf ** 2
+        return query_cos_div_tf_df

@@ -12,7 +12,7 @@ class DBManager:
 
     def __init__(self):
         print("DBManager: Set up Database")
-        self.client = MongoClient('172.17.0.2:27017')
+        self.client = MongoClient('127.0.0.1:27017')
         self.db = self.client.db
         self.docs = self.db.docs
         self.terms = self.db.terms

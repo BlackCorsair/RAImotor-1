@@ -3,19 +3,15 @@
 
 ## Resumen
 
-Se pide desarrollar un script en Python que implemente un Modelo Vectorial de recuperación para el cálculo de similitud entre documentos y consultas. Se trabajará en el ámbito de la minería de textos y el procesamiento del lenguaje natural (PLN).
+Se pide desarrollar un script en Python que implemente un Motor de Recuperación para el cálculo de métricas de recuperación dados unos documentos y unas consultas. Se trabajará en el ámbito de la minería de textos y el procesamiento del lenguaje natural (PLN).
 
 ## Consultas
 
-**Q1** - What video game won Spike's best driving game award in 2006?
-
-**Q2** - What is the default combination of Kensington cables?
-
-**Q3** - Who won the first ACM Gerard Salton prize?
+Las que se encuentran en el fichero 2010-topics.xml
 
 ## Documentos
 
-Se trabajará con [5 documentos HTML](https://github.com/FCLatorre/RAIvectorial/tree/develop/docrepository) en idioma inglés.
+Se trabajará con la colección de documentos proporcionada, pero no se han incluido en el repositorio por una cuestión de espacio, en idioma inglés.
 
 ## Acrónimos
 
@@ -33,23 +29,6 @@ N = número total de documentos de la colección
 
 ## Funciones de similitud
 
-**Producto Escalar TF:** Función de similitud del producto escalar con pesos según TF
-
-sim(dj,q) = dj * q =  Σ Wij * Wiq
-
-donde Wij = tfi,j = fi,j
-
-**Producto Escalar TF IDF:** Función de similitud del producto escalar con TFxIDF
-
-sim(dj,q) = dj * q =  Σ Wij * Wiq
-
-donde Wij = tfi,j * idfi = fi,j * log(N/ni)
-
-**Coseno TF:** Función de similitud del coseno con pesos TF
-
-CosSim (dj, q) = (Σ Wij * Wiq) / [sqrt(Σ W^2ij) * sqrt(Σ W^2iq)]
-
-donde Wij = tfi,j = fi,j
 
 **Coseno TF IDF:** Función de similitud del coseno con pesos TFxIDF
 
@@ -57,51 +36,6 @@ CosSim (dj, q) = (Σ Wij * Wiq) / [sqrt(Σ W^2ij) * sqrt(Σ W^2iq)]
 
 donde Wij = tfi,j * idfi = fi,j * log(N/ni)
 
-## Output
-
-El output que se muestre por consola tendrá el siguiente formato (X,XX hace referencia a un número con dos cifras decimales):
-
-**RELEVANCIA: ProductoEscalarTF**
-
-| Nombre del doc | Q1   | Q2   | Q3   |
-|----------------|------|------|------|
-| 2010-22-100    | X,XX | X,XX | X,XX |
-| 2010-42-103    | X,XX | X,XX | X,XX |
-| 2010-58-044    | X,XX | X,XX | X,XX |
-| 2010-76-088    | X,XX | X,XX | X,XX |
-| 2010-99-086    | X,XX | X,XX | X,XX |
-
-**RELEVANCIA: ProductoEscalarTFIDF**
-
-| Nombre del doc | Q1   | Q2   | Q3   |
-|----------------|------|------|------|
-| 2010-22-100    | X,XX | X,XX | X,XX |
-| 2010-42-103    | X,XX | X,XX | X,XX |
-| 2010-58-044    | X,XX | X,XX | X,XX |
-| 2010-76-088    | X,XX | X,XX | X,XX |
-| 2010-99-086    | X,XX | X,XX | X,XX |
-
-**RELEVANCIA: CosenoTF**
-
-| Nombre del doc | Q1   | Q2   | Q3   |
-|----------------|------|------|------|
-| 2010-22-100    | X,XX | X,XX | X,XX |
-| 2010-42-103    | X,XX | X,XX | X,XX |
-| 2010-58-044    | X,XX | X,XX | X,XX |
-| 2010-76-088    | X,XX | X,XX | X,XX |
-| 2010-99-086    | X,XX | X,XX | X,XX |
-
-**RELEVANCIA: CosenoTFIDF**
-
-| Nombre del doc | Q1   | Q2   | Q3   |
-|----------------|------|------|------|
-| 2010-22-100    | X,XX | X,XX | X,XX |
-| 2010-42-103    | X,XX | X,XX | X,XX |
-| 2010-58-044    | X,XX | X,XX | X,XX |
-| 2010-76-088    | X,XX | X,XX | X,XX |
-| 2010-99-086    | X,XX | X,XX | X,XX |
-
-Para cada tupla de documento-consulta en la matriz, se debe mostrar el valor correspondiente.
 
 ## Clases
 
@@ -126,11 +60,14 @@ Se deben normalizar las palabras en base a:
 
 **search:** se encarga de computar todos los cálculos de los algoritmos correspondientes (producto escalar TF, producto escalar TF-IDF, coseno TF o coseno TF-IDF) dado un documento y una consulta. Se ha optado por hacer todos los cálculos de golpe por motivos de eficiencia con respecto a la recuperación de base de datos.
 
+**metrics:** se encarga de computar todas las métricas para cada una de las consultas, con el conjunto relevante de documentos correspondiente.
+
 **cleanDB:** en caso de necesitar limpiar la base de datos para empezar de cero, ejecutar esta clase en lugar de controller y proceder luego normalmente con el setup de controller.
 
 ## Archivos y carpetas
 
-* *queryfile.txt:* archivo txt con las consultas (una por línea)
+* *2010-topics.xml:* archivo txt con las consultas (una por línea)
+* *union.trel:* archivo txt con las consultas (una por línea)
 * */docrepository/:* carpeta con los documentos HTML
 
 ## Base de datos

@@ -161,7 +161,7 @@ class Metrics:
         for file in files:
             if file == relFile:
                 rrank = 1 / position
-                return {'rrank1': rrank}
+                return {'rrank2': rrank}
             position += 1
         rrank = 1 / position
         return {'rrank2': rrank}
