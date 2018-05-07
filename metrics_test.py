@@ -13,3 +13,4 @@ precision = m.cutPrecision(sorted(files), '2010-001')
 print(precision)
 # tests the FMeasure
 FMeasure = m.FMeasure(precision, recall)
+print(FMeasure)
