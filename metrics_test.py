@@ -20,3 +20,6 @@ print(RRank1)
 # tests the RRank2
 RRank2 = m.RRank2(files, '2010-001')
 print(RRank2)
+# tests the Aprecision
+Aprecision = m.APrecision(files, '2010-001')
+print(Aprecision)

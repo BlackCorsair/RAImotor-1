@@ -163,3 +163,33 @@ class Metrics:
             position += 1
         rrank = 1 / position
         return {'rrank2': rrank}
+
+    '''
+        Average Precision: will add all the relevance between the
+        retrieved files and then will divide it by the number of
+        total relevant files in the query
+    '''
+
+    '''
+       Name: APrecision
+       In: files, queryID
+       Out: returns the a dict with the Average Precision (float)
+       Function: given a query ID and a set of files, calcs the Average
+                Precision (with a maximum of 100 files) and then returns
+                it
+    '''
+
+    def APrecision(self, files, queryID):
+        # checks the relevance of the Files
+        queryID = str(queryID)
+        pool = multiprocessing.Pool()
+        relevance = [
+            pool.map(partial(self.checkRelevance, queryID=queryID), files)]
+        totalRel = 0
+        totalRelFiles = 0
+        for (file, rel) in relevance[0][:99]:
+            if rel >= 1:
+                totalRelFiles += 1
+                totalRel += rel
+        aprecision = totalRel / totalRelFiles
+        return {'aprecision': aprecision}
