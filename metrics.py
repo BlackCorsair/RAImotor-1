@@ -105,3 +105,44 @@ class Metrics:
         fvalue10 = 2 * (precision['precision10'] * recall['recall10'] /
                         (precision['precision10'] + recall['recall10']))
         return {'fvalue5': fvalue5, 'fvalue10': fvalue10}
+
+    '''
+        Reciprocal Rank 1: search the first relevant file in the trel file
+        and compares it with the order in wich files have been retrieved
+    '''
+
+    '''
+       Name: checkRank
+       In: queryID, relevance
+       Out: returns the first file (string) with the given relevance or
+            greater
+       Function: given a query ID and a relevance, searchs the first
+                file and returns it
+   '''
+
+    def checkRank(self, queryID, rel):
+        trel = open(self.trelFile, 'r')
+        for line in trel:
+            if queryID in line and int(line.split()[3]) >= rel:
+                return str(line.split()[2])
+
+    '''
+        Name: RRank1
+        In: files retrieved, queryID
+        Out: returns a dict with the RRank1 (float value)
+        Function: given a set of retrieved files and it's query ID, it will
+                return the Reciprocal Rank (see above)
+    '''
+
+    def RRank1(self, files, queryID):
+        relFile = self.checkRank(queryID, 1)
+        position = 1
+        for file in files:
+            print("relFile:" + relFile)
+            print("file:" + file)
+            if file == relFile:
+                rrank = 1 / position
+                return {'rrank1': rrank}
+            position += 1
+        rrank = 1 / position
+        return {'rrank1': rrank}

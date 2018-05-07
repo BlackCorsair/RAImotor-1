@@ -14,3 +14,6 @@ print(precision)
 # tests the FMeasure
 FMeasure = m.FMeasure(precision, recall)
 print(FMeasure)
+# tests the RRank1
+RRank1 = m.RRank1(files, '2010-001')
+print(RRank1)
