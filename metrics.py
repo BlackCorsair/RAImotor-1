@@ -138,11 +138,28 @@ class Metrics:
         relFile = self.checkRank(queryID, 1)
         position = 1
         for file in files:
-            print("relFile:" + relFile)
-            print("file:" + file)
             if file == relFile:
                 rrank = 1 / position
                 return {'rrank1': rrank}
             position += 1
         rrank = 1 / position
         return {'rrank1': rrank}
+
+    '''
+        Name: RRank1
+        In: files retrieved, queryID
+        Out: returns a dict with the RRank1 (float value)
+        Function: given a set of retrieved files and it's query ID, it will
+                return the Reciprocal Rank (see above)
+    '''
+
+    def RRank2(self, files, queryID):
+        relFile = self.checkRank(queryID, 2)
+        position = 1
+        for file in files:
+            if file == relFile:
+                rrank = 1 / position
+                return {'rrank1': rrank}
+            position += 1
+        rrank = 1 / position
+        return {'rrank2': rrank}

@@ -17,3 +17,6 @@ print(FMeasure)
 # tests the RRank1
 RRank1 = m.RRank1(files, '2010-001')
 print(RRank1)
+# tests the RRank2
+RRank2 = m.RRank2(files, '2010-001')
+print(RRank2)
