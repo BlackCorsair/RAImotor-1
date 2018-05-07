@@ -1,6 +1,8 @@
 #!venv/bin/python
 import multiprocessing
 from functools import partial
+from operator import itemgetter
+from math import log2
 
 
 class Metrics:
@@ -193,3 +195,55 @@ class Metrics:
                 totalRel += rel
         aprecision = totalRel / totalRelFiles
         return {'aprecision': aprecision}
+
+    '''
+       Name: nDCG
+       In: files, queryID, nFiles
+       Out: returns the a dict with the DCG at nFiles
+       Function: given a query ID and a set of files, calcs the Normalized
+                Discounted Cumulated Gain and then returns it
+    '''
+
+    def nDCG(self, files, queryID, nFiles):
+        # checks the relevance of the Files
+        queryID = str(queryID)
+        pool = multiprocessing.Pool()
+        relevance = [
+            pool.map(partial(self.checkRelevance, queryID=queryID), files)][0]
+        # saves the relevance for the nFiles in a list
+        G = [rel for (doc, rel) in relevance[:(nFiles - 1)]]
+        CG = []
+        # saves the relevance for the nFiles SORTED from greater
+        # to lower in a list
+        Gi = [rel for (doc, rel) in sorted(
+            relevance[:(nFiles - 1)], key=itemgetter(1), reverse=True)]
+        CGi = []
+        # calculates the DCG, DCGideal and nDCG (nDCG = DCG/DCGi)
+        DCG = []
+        DCGi = []
+        nDCG = []
+        for index, item in enumerate(G):
+            # Calcs CG and CGi
+            if index == 0:
+                CG.append(item)
+                CGi.append(Gi[index])
+            else:
+                CGValue = CG[index - 1] + item
+                CGiValue = CGi[index - 1] + Gi[index]
+                CG.append(CGValue)
+                CGi.append(CGiValue)
+            # calcs DCG and DCGi
+            if index < 2:
+                DCG.append(CG[index])
+                DCGi.append(CGi[index])
+            else:
+                DCGValue = DCG[index - 1] + G[index] / log2(index)
+                DCGiValue = DCGi[index - 1] + Gi[index] / log2(index)
+                DCG.append(DCGValue)
+                DCGi.append(DCGiValue)
+            # calcs the nDCG
+            nDCGValue = DCG[index] / DCGi[index]
+            nDCG.append(nDCGValue)
+        # set the name of the dict
+        name = 'nDCG' + str(nFiles)
+        return {name: nDCG}

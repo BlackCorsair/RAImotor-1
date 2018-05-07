@@ -23,3 +23,6 @@ print(RRank2)
 # tests the Aprecision
 Aprecision = m.APrecision(files, '2010-001')
 print(Aprecision)
+# tests the nDCG
+nDCG = m.nDCG(files, '2010-001', 10)
+print(nDCG)
