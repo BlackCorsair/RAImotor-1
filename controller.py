@@ -127,23 +127,24 @@ class Controller:
                     print('The element is not encoded in ASCII.')
         self.manager.updateIDF()
 
-    def computeTable(self, topicArray, result, table, debug, limit):
+    def computeTable(self, topicArray, result, table, debug, threshold, limit):
         count = 0
         for topic in topicArray:
             index = topic['id']
             if debug:
                 count = count + 1
-                if count == 2:
+                if count == limit:
                     break
             table[index] = []
             aux = result[topic['id']]
             for r in aux:
                 # Recuperar resultado de Coseno TF IDF
-                if r['cosTF_IDF'] and r['cosTF_IDF'] >= limit:
+                if r['cosTF_IDF'] and r['cosTF_IDF'] >= threshold:
                     table[index].append(r['doc'].split('.')[0])
         return table
 
     def displayResults(self, debug):
+        limit = 5
         topicArray = []
         if debug:
             print("Running...")
@@ -161,7 +162,7 @@ class Controller:
             if debug:
                 print(topic['query'])
                 count = count + 1
-                if count == 2:
+                if count == limit:
                     break
             normalized = self.normalizer.normalize(topic['query'])
             queryArray = []
@@ -183,21 +184,23 @@ class Controller:
             result[topic['id']] = sorted(self.searcher.calcAll(normalized, self.manager.docs, self.manager.relations, self.manager.terms), key=itemgetter('doc'))
             
         
-        threshold = 0.01
-        table['0.Metrics'] = ['recall10', 'recall5','precision10', 'precision5','fvalue10','fvalue5', 'rrank1', 'rrank2', 'aprecision', 'nDCG10']
-        table = self.computeTable(topicArray, result, table, debug, threshold)
+        threshold = 0.015
+        table['Metrics'] = ['numDocs','recall10', 'recall5','precision10', 'precision5','fvalue10','fvalue5', 'rrank1', 'rrank2', 'aprecision', 'nDCG10']
+        table = self.computeTable(topicArray, result, table, debug, threshold, limit)
         
         count = 0
         for topic in topicArray:
             if debug:
                 count = count + 1
-                if count == 2:
+                if count == limit:
                     break
             files = table[topic['id']]
             print(topic['id'])
 
             table[topic['id']] = []
 
+            table[topic['id']].append(len(files))
+            
             recall = self.metrics.cutRecall(sorted(files), topic['id'])
             table[topic['id']].append(recall['recall10'])
             table[topic['id']].append(recall['recall5'])
@@ -227,8 +230,42 @@ class Controller:
             # tests the nDCG
             nDCG = self.metrics.nDCG(files, topic['id'], 10)
             table[topic['id']].append(nDCG['nDCG10'])
-            
         
+        '''
+        table['Metricas'] = ['numDocs','recall10', 'recall5','precision10', 'precision5','fvalue10','fvalue5', 'rrank1', 'rrank2', 'aprecision', 'nDCG10']
+        table['2010-001'] = [20, 0.8, 0.9,0.5833, 0.3333, 0.6363, 0.470588, 0.0769, 0.1111, 1.125, [0.5, 0.6666, 0.75, 0.6478, 0.6821, 0.6293, 0.6988, 0.69887, 0.81874]]
+        table['2010-002'] = [10, 0.8, 0.6,0.5833, 0.3333, 0.6363, 0.470588, 0.0769, 0.1111, 1.125, [0.5, 0.6666, 0.75, 0.6478, 0.6821, 0.6293, 0.6988, 0.69887, 0.81874]]
+        table['2010-003'] = [15, 0.8, 0.3,0.5833, 0.3333, 0.6363, 0.470588, 0.0769, 0.1111, 1.125, [0.5, 0.6666, 0.75, 0.6478, 0.6821, 0.6293, 0.6988, 0.69887, 0.81874]]
+        #table['2010-004'] = [20, 0.8, 0.7,0.5833, 0.3333, 0.6363, 0.470588, 0.0769, 0.1111, 1.125, [0.5, 0.6666, 0.75, 0.6478, 0.6821, 0.6293, 0.6988, 0.69887, 0.81874]]
+        #table['2010-005'] = [20, 0.8, 0.7,0.5833, 0.3333, 0.6363, 0.470588, 0.0769, 0.1111, 1.125, [0.5, 0.6666, 0.75, 0.6478, 0.6821, 0.6293, 0.6988, 0.69887, 0.81874]]
+        '''
+        #Calcular las medias
+        avgDocs, avgR10, avgR5, avgP10, avgP5, avgF10, avgF5, avgRR1, avgRR2, avgAP = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        for topic in table:
+            if topic != 'Metricas':
+                avgDocs += table[topic][0]
+                avgR10 += table[topic][1]
+                avgR5 += table[topic][2]
+                avgP10 += table[topic][3]
+                avgP5 += table[topic][4]
+                avgF10 += table[topic][5]
+                avgF5 += table[topic][6]
+                avgRR1 += table[topic][7]
+                avgRR2 += table[topic][8]
+                avgAP += table[topic][9]
+
+        size = len(table) - 1
+        table['Medias'] = []
+        table['Medias'].append(avgDocs/size)
+        table['Medias'].append(avgR10/size)
+        table['Medias'].append(avgR5/size)
+        table['Medias'].append(avgP10/size)
+        table['Medias'].append(avgP5/size)
+        table['Medias'].append(avgF10/size)
+        table['Medias'].append(avgF5/size)
+        table['Medias'].append(avgRR1/size)
+        table['Medias'].append(avgRR2/size)
+        table['Medias'].append(avgAP/size)
         print(tabulate(table, headers="keys"))
 
 controller = Controller()
