@@ -102,10 +102,18 @@ class Metrics:
     '''
 
     def FMeasure(self, precision, recall):
-        fvalue5 = 2 * (precision['precision5'] * recall['recall5'] /
-                       (precision['precision5'] + recall['recall5']))
-        fvalue10 = 2 * (precision['precision10'] * recall['recall10'] /
-                        (precision['precision10'] + recall['recall10']))
+        fvalue5 = 0.0
+        fvalue10 = 0.0
+        try:
+            fvalue5 = 2 * (precision['precision5'] * recall['recall5'] /
+                           (precision['precision5'] + recall['recall5']))
+        except ZeroDivisionError:
+            fvalue5 = 0
+        try:
+            fvalue10 = 2 * (precision['precision10'] * recall['recall10'] /
+                            (precision['precision10'] + recall['recall10']))
+        except ZeroDivisionError:
+            fvalue10 = 0
         return {'fvalue5': fvalue5, 'fvalue10': fvalue10}
 
     '''
