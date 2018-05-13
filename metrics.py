@@ -250,8 +250,11 @@ class Metrics:
                 DCG.append(DCGValue)
                 DCGi.append(DCGiValue)
             # calcs the nDCG
-            nDCGValue = DCG[index] / DCGi[index]
-            nDCG.append(nDCGValue)
+            try:
+                nDCGValue = DCG[index] / DCGi[index]
+                nDCG.append(nDCGValue)
+            except ZeroDivisionError:
+                nDCG.append(0)
         # set the name of the dict
         name = 'nDCG' + str(nFiles)
         return {name: nDCG}
