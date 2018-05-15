@@ -82,9 +82,15 @@ class Metrics:
         count = 0
         for (doc, rel) in sorted(relevance[0]):
             if rel >= 1 and count < 5:
-                precision5 = precision5 + (1 / fileNumber)
+                try:
+                    precision5 = precision5 + (1 / fileNumber)
+                except ZeroDivisionError:
+                    precision5 = 0
             if rel >= 1 and count < 10:
-                precision10 = precision10 + (1 / fileNumber)
+                try:
+                    precision10 = precision10 + (1 / fileNumber)
+                except ZeroDivisionError:
+                    precision10 = 0
             count += 1
         precision = {'precision5': precision5, 'precision10': precision10}
         return precision
@@ -201,7 +207,10 @@ class Metrics:
             if rel >= 1:
                 totalRelFiles += 1
                 totalRel += rel
-        aprecision = totalRel / totalRelFiles
+        try:
+            aprecision = totalRel / totalRelFiles
+        except ZeroDivisionError:
+            aprecision = 0
         return {'aprecision': aprecision}
 
     '''
