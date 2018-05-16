@@ -11,7 +11,8 @@ class Normalizer:
                '%', '^', '&', '*', '<', '>', '(', ')', '_', '-', '+', '=',
                '{', '}', '[', ']', '/', '.', ':', ',', ';', '|',
                '\"', '`', '“', '”', '--', '©', '®', '¦', '..', '‘',
-               '’', '\'\'']
+               '’', '\'\'','�','\\']
+    numbers = ['0','1','2','3','4','5','6','7','8','9']
 
     def __init__(self):
         print("Normalizer init")
@@ -28,27 +29,20 @@ class Normalizer:
         filteredWords = []
 
         for w in tokenizetext:
-            if self.isNotStoppedWord(w):
-                # print("This is not a stopword:", w)
-                # Remove quotation or symbol
-                if w.startswith('\''):
-                    w = w.replace('\'', '')
-                if w.endswith('\''):
-                    w = w.replace('\'', '')
-                if w.endswith('�'):
-                    w = w.replace('�', '')
-                if w.endswith('/'):
-                    w = w.replace('/', '')
-                # Remove slash and append both words
-                pattern = re.compile('^[a-zA-Z]+\/[a-zA-Z]+')
-                if pattern.match(w):
-                    x = w.split('/')
-                    filteredWords.append(x[0].lower())
-                    filteredWords.append(x[1].lower())
-                else:
-                    filteredWords.append(lem.lemmatize(w.lower()))
-
-        # print ("Normalized words",filteredWords)
+            if len(w) <= 20 and len(w)>2:
+                if self.isNotStoppedWord(w):
+                    filteredWords.append(lem.lemmatize(w.lower()))  
+                    '''
+                    # Remove slash and append both words
+                    pattern = re.compile('^[a-zA-Z]+\/[a-zA-Z]+')
+                    if pattern.match(w):
+                        x = w.split('/')
+                        filteredWords.append(x[0].lower())
+                        filteredWords.append(x[1].lower())
+                    else:
+                        filteredWords.append(lem.lemmatize(w.lower()))
+                    '''
+        #print ("Normalized words",filteredWords)
         fdist = nltk.FreqDist(filteredWords)
         # print ("Original FreqDist: ",
         # nltk.FreqDist(tokenizetext),"; Normalizer FreqDist:",fdist)
@@ -57,12 +51,19 @@ class Normalizer:
     def isNotStoppedWord(self, word):
         stopWords = set(stopwords.words('english')).union(
             ['...', '\'s', '--', '``'])
-        # print("isNotStoppedWord: word ", word)
+        # Remove quotation or symbol
+        if word.startswith('\''):
+            word = word.replace('\'', '')
+        if word.endswith('\''):
+            word = word.replace('\'', '')
+        if word.endswith('�'):
+            word = word.replace('�', '')
+        if word.endswith('/'):
+            word = word.replace('/', '')
         if(word.lower() in stopWords):
-            # print("Word ", word.lower(), " is a stoppedWord")
-            return False
-        elif(word in self.symbols):
-            # print("Word ", word, " is a symbol")
             return False
         else:
-            return True
+            for char in word:
+                if char in self.symbols or char in self.numbers:
+                    return False
+        return True

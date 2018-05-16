@@ -166,6 +166,7 @@ class Controller:
                     break
             normalized = self.normalizer.normalize(topic['query'])
             queryArray = []
+            
             for term in normalized:
                 if debug:
                     print("Synonyms for term: ", term)
@@ -181,11 +182,11 @@ class Controller:
             if debug:
                 print("Extended Query>>>>>",queryArray)
             
-            result[topic['id']] = sorted(self.searcher.calcAll(normalized, self.manager.docs, self.manager.relations, self.manager.terms), key=itemgetter('doc'))
+            result[topic['id']] = sorted(self.searcher.calcAll(queryArray, self.manager.docs, self.manager.relations, self.manager.terms), key=itemgetter('doc'))
             
         
-        threshold = 0.015
-        table['Metrics'] = ['numDocs','recall10', 'recall5','precision10', 'precision5','fvalue10','fvalue5', 'rrank1', 'rrank2', 'aprecision', 'nDCG10']
+        threshold = 0.09
+        table['Metricas'] = ['numDocs','recall10', 'recall5','precision10', 'precision5','fvalue10','fvalue5', 'rrank1', 'rrank2', 'aprecision', 'nDCG10']
         table = self.computeTable(topicArray, result, table, debug, threshold, limit)
         
         count = 0
